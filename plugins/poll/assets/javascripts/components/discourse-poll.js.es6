@@ -30,38 +30,9 @@ export default Ember.Component.extend({
     this.set("model", this.get("post.pollsObject")[this.get("model.name")]);
   },
 
-  @computed("model", "vote", "model.voters", "model.options", "model.status")
-  poll(poll, vote) {
-    if (poll) {
-      const options = _.map(poll.get("options"), o => Em.Object.create(o));
-
-      if (vote) {
-        options.forEach(o => o.set("selected", vote.indexOf(o.get("id")) >= 0));
-      }
-
-      poll.set("options", options);
-    }
-
-    return poll;
-  },
-
   @computed("poll.options.@each.selected")
   selectedOptions() {
     return _.map(this.get("poll.options").filterBy("selected"), o => o.get("id"));
-  },
-
-  @computed("poll.min")
-  min(min) {
-    min = parseInt(min, 10);
-    if (isNaN(min) || min < 1) { min = 1; }
-    return min;
-  },
-
-  @computed("poll.max", "poll.options.length")
-  max(max, options) {
-    max = parseInt(max, 10);
-    if (isNaN(max) || max > options) { max = options; }
-    return max;
   },
 
   @computed("poll.voters")
@@ -130,45 +101,7 @@ export default Ember.Component.extend({
 
   actions: {
 
-    toggleOption(option) {
-      if (this.get("isClosed")) { return; }
-      if (!this.currentUser) { return this.send("showLogin"); }
-
-      const wasSelected = option.get("selected");
-
-      if (!this.get("isMultiple")) {
-        this.get("poll.options").forEach(o => o.set("selected", false));
-      }
-
-      option.toggleProperty("selected");
-
-      if (!this.get("isMultiple") && !wasSelected) { this.send("castVotes"); }
-    },
-
     castVotes() {
-      if (!this.get("canCastVotes")) { return; }
-      if (!this.currentUser) { return this.send("showLogin"); }
-
-      this.set("loading", true);
-
-      ajax("/polls/vote", {
-        type: "PUT",
-        data: {
-          post_id: this.get("post.id"),
-          poll_name: this.get("poll.name"),
-          options: this.get("selectedOptions"),
-        }
-      }).then(results => {
-        const poll = results.poll;
-        const votes = results.vote;
-
-        this.setProperties({ vote: votes, showResults: true });
-        this.set("model", Em.Object.create(poll));
-      }).catch(() => {
-        bootbox.alert(I18n.t("poll.error_while_casting_votes"));
-      }).finally(() => {
-        this.set("loading", false);
-      });
     },
 
     toggleResults() {
