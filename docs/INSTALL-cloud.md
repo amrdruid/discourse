@@ -8,7 +8,7 @@
 
 - Enter your domain `discourse.example.com` as the name.
 
-- The default of **1 GB** RAM works fine for small Discourse communities. We recommend 2 GB RAM for larger communities.
+- The default of **2 GB** RAM works fine for small Discourse communities. We recommend >= 2 GB RAM for larger communities.
 
 - The default of **Ubuntu 16.04 LTS x64** works fine. At minimum, a 64-bit Linux OS with a kernel version of 3.10+ is required.
 
